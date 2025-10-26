@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaBars, FaTimes } from "react-icons/fa";
 
-const Navbar = () => {
+function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const isLoggedIn = !!localStorage.getItem("token");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -13,23 +14,22 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="backdrop-blur-md bg-gradient-to-r from-blue-600/90 via-blue-700/90 to-indigo-800/90 shadow-lg sticky top-0 z-50">
-      <div className="container mx-auto flex justify-between items-center py-3 px-4 md:px-8">
-        {/* Logo */}
+    <nav className="navbar bg-white shadow-md sticky top-0 z-50">
+      <div className="navbar-content flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
+        {/* Brand */}
         <Link
           to="/"
-          className="text-white text-3xl font-extrabold tracking-tight drop-shadow-md hover:scale-105 transition-transform duration-300"
+          className="brand text-2xl font-bold text-indigo-700 hover:text-indigo-800 transition-colors duration-300"
         >
           MyApp
         </Link>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Menu Toggle */}
         <button
-          className="md:hidden text-white hover:text-gray-200 focus:outline-none transition-colors"
+          className="md:hidden text-indigo-700 hover:text-indigo-900 focus:outline-none"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
         >
-          {isMobileMenuOpen ? <FaTimes size={26} /> : <FaBars size={26} />}
+          {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
         </button>
 
         {/* Navigation Links */}
@@ -37,20 +37,18 @@ const Navbar = () => {
           className={`${
             isMobileMenuOpen ? "flex" : "hidden"
           } md:flex flex-col md:flex-row absolute md:static top-16 left-0 right-0 
-          bg-gradient-to-b from-blue-700/95 to-blue-900/95 md:bg-transparent 
-          backdrop-blur-md md:backdrop-blur-0 p-6 md:p-0 space-y-6 md:space-y-0 
-          md:space-x-8 items-center shadow-lg md:shadow-none rounded-b-2xl md:rounded-none 
-          transition-all duration-300 ease-in-out`}
+          bg-white md:bg-transparent border-t md:border-none shadow-md md:shadow-none 
+          md:space-x-8 space-y-4 md:space-y-0 items-center p-6 md:p-0 transition-all duration-300`}
         >
           {isLoggedIn ? (
             <>
-              <Link
+              <NavLink
                 to="/dashboard"
-                className="text-white text-lg font-medium hover:text-cyan-300 transition-colors duration-300"
+                active={location.pathname === "/dashboard"}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Dashboard
-              </Link>
+              </NavLink>
               <button
                 onClick={() => {
                   handleLogout();
@@ -63,26 +61,57 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Link
+              <NavLink
                 to="/login"
-                className="text-white text-lg font-medium hover:text-cyan-300 transition-colors duration-300"
+                active={location.pathname === "/login"}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Login
-              </Link>
-              <Link
+              </NavLink>
+              <NavLink
                 to="/register"
-                className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-5 py-2 rounded-full font-semibold hover:from-cyan-600 hover:to-blue-600 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                active={location.pathname === "/register"}
                 onClick={() => setIsMobileMenuOpen(false)}
+                button
               >
                 Register
-              </Link>
+              </NavLink>
             </>
           )}
         </div>
       </div>
     </nav>
   );
-};
+}
+
+function NavLink({ to, active, children, onClick, button = false }) {
+  if (button) {
+    return (
+      <Link
+        to={to}
+        onClick={onClick}
+        className={`${
+          active
+            ? "bg-gradient-to-r from-cyan-500 to-blue-500"
+            : "bg-gradient-to-r from-cyan-400 to-blue-400"
+        } text-white px-5 py-2 rounded-full font-semibold hover:from-cyan-600 hover:to-blue-600 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300`}
+      >
+        {children}
+      </Link>
+    );
+  }
+
+  return (
+    <Link
+      to={to}
+      onClick={onClick}
+      className={`nav-link text-lg font-medium ${
+        active ? "text-indigo-700 font-semibold" : "text-gray-700"
+      } hover:text-indigo-800 transition-colors duration-300`}
+    >
+      {children}
+    </Link>
+  );
+}
 
 export default Navbar;
